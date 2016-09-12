@@ -12,6 +12,12 @@ import (
 	"github.com/heroku/docker-registry-client/registry"
 )
 
+var layer int
+
+func init() {
+	flag.IntVar(&layer, "layer", -1, "layer to extract from")
+}
+
 func main() {
 	flag.Parse()
 
@@ -46,9 +52,13 @@ func main() {
 	}
 
 	log.Printf("Found %d manifest layers, using layer %d", len(manifest.FSLayers), len(manifest.FSLayers)-1)
-	layer := manifest.FSLayers[len(manifest.FSLayers)-1]
 
-	reader, err := hub.DownloadLayer(image, layer.BlobSum)
+	if layer < 0 {
+		layer += len(manifest.FSLayers)
+	}
+	fslayer := manifest.FSLayers[layer]
+
+	reader, err := hub.DownloadLayer(image, fslayer.BlobSum)
 	if err != nil {
 		log.Fatalf("cannot read layer")
 	}

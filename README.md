@@ -1,7 +1,7 @@
 A small utility to extract files from a Docker hub image and output as a tarball.
 
-It assumes that the files you are interested in are in the top layer. It would be
-better to work out which layer they are in of course.
+It defaults to the latest layer in the image, specify `-layer 0` for the bottom layer.
+Negative numbers count from the top.
 
 ```
 ./regextract library/alpine 2>/dev/null | tar tf -
