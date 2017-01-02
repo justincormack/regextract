@@ -14,16 +14,18 @@ import (
 
 var layer int
 var output string
+var latestOnly bool
 
 func init() {
 	flag.StringVar(&output, "output", "", "output file")
+	flag.BoolVar(&latestOnly, "latest", false, "download only the latest layer")
 }
 
 func main() {
 	flag.Parse()
 
 	if flag.NArg() < 1 {
-		log.Fatalf("usage: regextract [--output=file.tgz] image[:tag] [files...]")
+		log.Fatalf("usage: regextract [--output=file.tgz] [--latest] image[:tag] [files...]")
 	}
 	tag := "latest"
 	it := strings.SplitN(flag.Arg(0), ":", 2)
@@ -51,12 +53,12 @@ func main() {
 		log.Fatalf("Cannot connect to registry")
 	}
 
-	manifest, err := hub.Manifest(image, tag)
+	manifest, err := hub.ManifestV2(image, tag)
 	if err != nil {
 		log.Fatalf("Cannot fetch manifest: %s", err)
 	}
 
-	log.Printf("Found %d manifest layers", len(manifest.FSLayers))
+	log.Printf("Found %d manifest layers", len(manifest.Layers))
 
 	f := os.Stdout
 	if output != "" {
@@ -69,13 +71,18 @@ func main() {
 
 	tw := tar.NewWriter(f)
 
-	for layer := 0; layer < len(manifest.FSLayers); layer++ {
+	layer := 0
+	if latestOnly {
+		layer = len(manifest.Layers) - 1
+	}
 
-		fslayer := manifest.FSLayers[layer]
+	for ; layer < len(manifest.Layers); layer++ {
 
-		reader, err := hub.DownloadLayer(image, fslayer.BlobSum)
+		fslayer := manifest.Layers[layer]
+
+		reader, err := hub.DownloadLayer(image, fslayer.Digest)
 		if err != nil {
-			log.Fatalf("cannot read layer")
+			log.Fatalf("cannot read layer: %v", err)
 		}
 		defer reader.Close()
 
