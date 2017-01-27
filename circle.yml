@@ -1,0 +1,9 @@
+machine:
+    environment:
+        PROJECT: $CIRCLE_PROJECT_REPONAME
+        IMPORT:  github.com/$CIRCLE_PROJECT_USERNAME/$PROJECT
+test:
+    post:
+        - GOOS=linux   GOARCH=amd64 go build -o $CIRCLE_ARTIFACTS/linux/amd64/$PROJECT       $IMPORT
+        - GOOS=darwin  GOARCH=amd64 go build -o $CIRCLE_ARTIFACTS/darwin/amd64/$PROJECT      $IMPORT
+        - GOOS=windows GOARCH=amd64 go build -o $CIRCLE_ARTIFACTS/windows/amd64/$PROJECT.exe $IMPORT

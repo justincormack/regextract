@@ -17,3 +17,9 @@ You can specify the files you want to extract eg
 regextract library/alpine bin/busybox | tar xf -
 ```
 Will extract busybox from Alpine (note lack of leading `/`).
+
+Binary artifacts for amd64 architectures are built by CI:
+
+- [MacOS](https://circleci.com/api/v1/project/justincormack/regextract/latest/artifacts/0/$CIRCLE_ARTIFACTS/darwin/amd64/regextract)
+- [Linux](https://circleci.com/api/v1/project/justincormack/regextract/latest/artifacts/0/$CIRCLE_ARTIFACTS/linux/amd64/regextract)
+- [Windows](https://circleci.com/api/v1/project/justincormack/regextract/latest/artifacts/0/$CIRCLE_ARTIFACTS/windows/amd64/regextract.exe)
